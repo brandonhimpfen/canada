@@ -1,0 +1,9 @@
+
+.dark body { background-color:#0f172a; color:#e2e8f0; }
+.kpi, .card { background: white; border:1px solid rgb(226 232 240); border-radius:1rem; box-shadow:0 10px 20px -12px rgba(2,6,23,.12); }
+.dark .kpi, .dark .card { background-color: rgba(15,23,42,.6); border-color:#1f2937; }
+.kpi { padding:1rem; } .kpi-label{font-size:.8rem;color:#475569}.kpi-value{font-size:1.35rem;font-weight:700;margin-top:.15rem}
+.card-header{padding:1rem 1rem 0 1rem}.card-title{font-weight:700}.card-subtitle{font-size:.8rem;color:#475569}
+.chart-canvas{width:100% !important; display:block}
+
+.chart-canvas{height:300px !important}

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="https://images.squarespace-cdn.com/content/v1/67254fff11ab1333e8c15fdb/fd800e36-2385-4e59-b67a-fec8c8da83e7/favicon.ico?format=100w"/>
+  <title>Canada–U.S. Economic Dashboard (Goods vs. Services) by Brandon Himpfen</title>
+  <link rel="canonical" href="https://us-canada.himpfen.com/">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <!-- Basic SEO -->
+  <meta name="title" content="Canada–U.S. Economic Dashboard">
+  <meta name="description" content="Factual Canada–U.S. trade & services data with CPI and FX context.">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://us-canada.himpfen.com/">
+  <meta property="og:title" content="Canada–U.S. Economic Dashboard">
+  <meta property="og:description" content="Factual Canada–U.S. trade & services data with CPI and FX context.">
+  <meta property="og:image" content="https://us-canada.himpfen.com/og-image.png">
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Canada–U.S. Economic Dashboard">
+  <meta name="twitter:description" content="Factual Canada–U.S. trade & services data with CPI and FX context.">
+  <meta name="twitter:image" content="https://us-canada.himpfen.com/og-image.png">
+  <!-- TailwindCSS config for dark mode via class -->
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = { darkMode: 'class' };
+  </script>
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+  <!-- Chart.js Annotation plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Canada–U.S. Economic Dashboard",
+    "url":"https://us-canada.himpfen.com/",
+    "inLanguage":"en-CA",
+    "publisher":{"@type":"Organization","name":"Brandon Himpfen","url":"https://www.himpfen.com"}
+  }
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-V95JJD382R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'G-V95JJD382R');
+  </script>
+</head>
+
+<body class="bg-slate-50 text-slate-900 transition-colors duration-300">
+  <header class="sticky top-0 z-30 backdrop-blur bg-white/70 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🇨🇦</span>
+        <h1 class="font-bold text-xl sm:text-2xl">Canada–U.S. Economic Dashboard</h1>
+        <span class="text-2xl">🇺🇸</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="darkToggle" class="px-3 py-2 rounded-xl border border-slate-300 text-sm hover:bg-slate-100">
+          Toggle dark
+        </button>
+        <a href="./" class="text-xs text-slate-500 hover:text-slate-700">v1.0</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Controls -->
+    <section class="mb-6">
+      <div class="rounded-2xl p-5 bg-white shadow-md border border-slate-200 dark:bg-slate-900/60 dark:border-slate-800">
+        <div class="flex flex-wrap items-center gap-4 text-sm">
+          <label class="inline-flex items-center gap-2"><input id="toggleIncludeServices" type="checkbox" class="scale-110"> Include services in net balance</label>
+          <label class="inline-flex items-center gap-2"><input id="toggleCAD" type="checkbox" class="scale-110"> Show values in CAD</label>
+          <label class="inline-flex items-center gap-2"><input id="toggleReal" type="checkbox" class="scale-110"> Show in real (inflation-adjusted) dollars</label>
+          <span class="text-xs text-slate-500">Tooltips: <span class="info" data-tip="Census basis: U.S. Census goods trade definitions. NSA: not seasonally adjusted. Services from BEA/USTR.">definitions (?)</span></span>
+        </div>
+      </div>
+    </section>
+    <!-- Claim checker -->
+    <section class="mb-6">
+      <div class="rounded-2xl p-5 bg-white shadow-md border border-slate-200 dark:bg-slate-900/60 dark:border-slate-800">
+        <h2 class="text-lg font-semibold mb-3">Claim checker: “The U.S. has a big trade imbalance with Canada.”</h2>
+        <p class="text-sm leading-6">
+          The U.S. ran a <span class="font-semibold">goods trade deficit</span> with Canada of
+          <span id="kpiGoodsDeficit2024" class="font-semibold"></span> in 2024 (Census). But the U.S. also ran a
+          <span class="font-semibold">services trade surplus</span> of <span id="kpiServicesSurplus2024" class="font-semibold"></span> (USTR).
+          Netting goods and services together, the overall balance in 2024 was
+          <span id="kpiNetBalance2024" class="font-semibold"></span> for the U.S.
+        </p>
+        <p class="text-xs mt-2 text-slate-600 dark:text-slate-300">
+          2025 year-to-date (Jan–Jun), the U.S. goods deficit with Canada is
+          <span id="kpiGoodsDeficit2025YTD" class="font-semibold"></span> (Census, not seasonally adjusted).
+        </p>
+      </div>
+    </section>
+
+    <!-- KPI cards -->
+    <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="kpi">
+        <div class="kpi-label">2024 U.S. Goods Exports → Canada</div>
+        <div class="kpi-value" id="kpiGoodsExports2024"></div>
+        <div class="kpi-footnote">Source: U.S. Census</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">2024 U.S. Goods Imports ← Canada</div>
+        <div class="kpi-value" id="kpiGoodsImports2024"></div>
+        <div class="kpi-footnote">Source: U.S. Census</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">2024 U.S. Services Exports → Canada</div>
+        <div class="kpi-value" id="kpiServicesExports2024"></div>
+        <div class="kpi-footnote">Source: USTR (from BEA)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">2024 U.S. Services Imports ← Canada</div>
+        <div class="kpi-value" id="kpiServicesImports2024"></div>
+        <div class="kpi-footnote">Source: USTR (from BEA)</div>
+      </div>
+    </section>
+
+    <!-- Charts -->
+    <section class="grid lg:grid-cols-2 gap-6 mb-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Monthly U.S. Goods Trade with Canada</h3>
+          <p class="card-subtitle">2024 (full year) vs. 2025 YTD (Jan–Jun), USD billions (NSA)</p>
+        </div>
+        <div class="relative">
+        <div class="absolute right-2 top-2 flex gap-2">
+          <button id="btnGoodsMonthlyCSV" class="btn-lite">CSV</button>
+          <button id="btnGoodsMonthlyPNG" class="btn-lite">PNG</button>
+        </div>
+        <canvas id="goodsMonthlyChart" class="chart-canvas"></canvas>
+      </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">2024 Snapshot: Goods vs. Services</h3>
+          <p class="card-subtitle">U.S. exports &amp; imports with Canada, USD billions</p>
+        </div>
+        <div class="relative">
+        <div class="absolute right-2 top-2 flex gap-2">
+          <button id="btnGoodsServicesCSV" class="btn-lite">CSV</button>
+          <button id="btnGoodsServicesPNG" class="btn-lite">PNG</button>
+        </div>
+        <canvas id="goodsServicesChart" class="chart-canvas"></canvas>
+      </div>
+      </div>
+    </section>
+
+    <!-- Claim Builder + Annual Chart with Annotations -->
+    <section class="grid lg:grid-cols-3 gap-6 mb-6">
+      <div class="card lg:col-span-2">
+        <div class="card-header">
+          <h3 class="card-title">Annual Goods Trade (2018–2025 YTD)</h3>
+          <p class="card-subtitle">USD billions (NSA). Shaded bands mark tariff episode (2018–2019), COVID shock (2020Q2), and USMCA start (2020-07-01).</p>
+        </div>
+        <div class="relative">
+          <div class="absolute right-2 top-2 flex gap-2">
+            <button id="btnAnnualCSV" class="btn-lite">CSV</button>
+            <button id="btnAnnualPNG" class="btn-lite">PNG</button>
+          </div>
+          <canvas id="annualGoodsChart" class="chart-canvas"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Claim Builder</h3>
+          <p class="card-subtitle">Generate a shareable, sourced statement.</p>
+        </div>
+        <div class="p-4 space-y-3">
+          <textarea id="claimText" class="w-full rounded-lg border border-slate-300 p-3 text-sm" rows="6" readonly></textarea>
+          <div class="flex gap-2">
+            <button id="btnCopyClaim" class="px-3 py-2 rounded-xl border border-slate-300 text-sm">Copy</button>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-300">Sources: U.S. Census (goods), USTR/BEA (services).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deeper Data Views -->
+    <section class="grid lg:grid-cols-2 gap-6 mb-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Top Goods Categories (2024)</h3>
+          <p class="card-subtitle">HS2 groups, USD billions. Two panels: Exports → Canada and Imports ← Canada.</p>
+        </div>
+        <div class="p-4">
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="relative">
+              <div class="absolute right-2 top-2 flex gap-2">
+                <button id="btnTopGoodsExpCSV" class="btn-lite">CSV</button>
+                <button id="btnTopGoodsExpPNG" class="btn-lite">PNG</button>
+              </div>
+              <canvas id="topGoodsExports" class="chart-canvas"></canvas>
+            </div>
+            <div class="relative">
+              <div class="absolute right-2 top-2 flex gap-2">
+                <button id="btnTopGoodsImpCSV" class="btn-lite">CSV</button>
+                <button id="btnTopGoodsImpPNG" class="btn-lite">PNG</button>
+              </div>
+              <canvas id="topGoodsImports" class="chart-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Services Breakdown (2024)</h3>
+          <p class="card-subtitle">Travel, Transport, Financial, IP, Other. USD billions.</p>
+        </div>
+        <div class="relative">
+          <div class="absolute right-2 top-2 flex gap-2">
+            <button id="btnServicesBreakCSV" class="btn-lite">CSV</button>
+            <button id="btnServicesBreakPNG" class="btn-lite">PNG</button>
+          </div>
+          <canvas id="servicesBreakdown" class="chart-canvas"></canvas>
+        </div>
+        <div id="servicesNote" class="px-4 pb-4 text-xs text-amber-700 hidden">NOTE: If any bars are zero, populate exact category amounts in <code>app.js</code> under SERVICES_BREAKDOWN_2024.</div>
+      </div>
+    </section>
+
+
+    <!-- Exchange rate + notes -->
+    <section class="grid lg:grid-cols-3 gap-6 mb-6">
+      <div class="card lg:col-span-2">
+        <div class="card-header">
+          <h3 class="card-title">Context: Exchange Rate</h3>
+          <p class="card-subtitle">Annual average CAD per USD</p>
+        </div>
+        <div class="p-4">
+          <p class="text-sm">2024 average: <span id="kpiFx2024" class="font-semibold"></span> CAD per 1 USD (FRED AEXCAUS).</p>
+          <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">Exchange rates influence cross-border prices and can affect measured trade values.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Methodology &amp; Caveats</h3>
+        </div>
+        <div class="p-4 text-sm">
+          <ul class="list-disc pl-5 space-y-2">
+            <li>Goods data are on a Census basis, not seasonally adjusted.</li>
+            <li>Services data are annual estimates for 2024 (BEA/USTR).</li>
+            <li>2025 YTD includes months available (Jan–Jun).</li>
+            <li>Totals may not equal sums due to rounding.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sources -->
+    <section class="mb-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Sources</h3>
+        </div>
+        <div class="p-4 text-sm leading-6">
+          <ol class="list-decimal pl-5 space-y-2">
+            <li>U.S. Census Bureau, <em>Trade in Goods with Canada</em> (2023–2025 monthly, totals).</li>
+            <li>Office of the U.S. Trade Representative (USTR), <em>Canada Country Page</em>, goods &amp; services totals for 2024.</li>
+            <li>Federal Reserve Bank of St. Louis (FRED), series AEXCAUS (annual average CAD per USD), 2024.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <footer class="py-10 text-center text-xs text-slate-500">
+      Canada–U.S. Economic Dashboard (Goods vs. Services) by <a href="https://www.himpfen.com" title="Brandon Himpfen" target="_blank">Brandon Himpfen</a>. All Rights Reserved.
+    </footer>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Energy & Critical Minerals Explorer</title>
+<script>window.tailwind=window.tailwind||{};window.tailwind.config={darkMode:'class'};</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body class="bg-slate-50 text-slate-900">
+<header class="sticky top-0 z-30 backdrop-blur bg-white/70 border-b border-slate-200 dark:bg-slate-900/70 dark:border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="/" class="text-sm underline">← canada.himpfen.com</a>
+    <button id="darkToggle" class="px-3 py-2 rounded-xl border border-slate-300 text-sm">Dark</button>
+  </div>
+</header>
+<main class="max-w-7xl mx-auto px-4 py-6">
+  <section class="grid lg:grid-cols-3 gap-6 mb-6">
+    <div class="card lg:col-span-2 overflow-hidden">
+      <div class="card-header"><h3 class="card-title">Energy & Minerals Map</h3><p class="card-subtitle">Hydro, wind, nuclear; nickel, lithium (demo sites).</p></div>
+      <div id="map" class="h-[520px]"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Production by province (index)</h3><p class="card-subtitle">Demo figures; replace with NRCan/CER.</p></div>
+      <canvas id="prodChart" class="chart-canvas"></canvas>
+    </div>
+  </section>
+</main>
+<script src="./energy.js" defer></script>
+</body></html>

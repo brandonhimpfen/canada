@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canada Dashboards</title>
+  <meta name="description" content="A collection of Canada-focused data explorers and maps.">
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = { darkMode:'class' };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/assets/shared.css">
+  <script defer src="/assets/shared.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="header-bar sticky top-0 border-b border-slate-200 bg-white/70 dark:bg-slate-900/70 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="font-bold">Canada Dashboards</div>
+      <nav class="nav text-sm flex gap-3">
+        <a href="/us-canada/">US–Canada</a>
+        <a href="/prosperity/">Prosperity</a>
+        <a href="/made-in-canada/">Made-in-Canada</a>
+        <a href="/places/">Places</a>
+        <a href="/innovations/">Innovations</a>
+        <a href="/languages/">Languages</a>
+        <a href="/energy/">Energy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-4">Explore Canada</h1>
+    <p class="text-slate-600 mb-6">A family of lightweight, factual data explorers—maps and dashboards designed for clarity and pride.</p>
+
+    <section class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <a href="/us-canada/" class="block p-5 rounded-2xl border border-slate-200 bg-white shadow hover:shadow-md transition">
+        <h3 class="font-semibold">US–Canada Economic Dashboard</h3>
+        <p class="text-sm text-slate-600 mt-1">Goods & services trade, FX, CPI, claims testing.</p>
+      </a>
+      <a href="/prosperity/" class="block p-5 rounded-2xl border border-slate-200 bg-white shadow hover:shadow-md transition">
+        <h3 class="font-semibold">Canada Prosperity Dashboard</h3>
+        <p class="text-sm text-slate-600 mt-1">Productivity, R&D, patents, investment (demo dataset).</p>
+      </a>
+      <a href="/made-in-canada/" class="block p-5 rounded-2xl border border-slate-200 bg-white shadow hover:shadow-md transition">
+        <h3 class="font-semibold">Made‑in‑Canada Supply Chain Map</h3>
+        <p class="text-sm text-slate-600 mt-1">Autos, aerospace, agri-food, batteries (demo dataset).</p>
+      </a>
+      <a href="/places/" class="block p-5 rounded-2xl border border-slate-200 bg-white shadow hover:shadow-md transition">
+        <h3 class="font-semibold">Great Canadian Places Index</h3>
+        <p class="text-sm text-slate-600 mt-1">Map + seasonality for parks, UNESCO, small towns.</p>
+      </a>
+      <a href="/innovations/" class="block p-5 rounded-2xl border border-slate-200 bg-white shadow hover:shadow-md transition">
+        <h3 class="font-semibold">Canadian Innovations Timeline</h3>
+        <p class="text-sm text-slate-600 mt-1">From insulin to AI labs—interactive timeline (demo).</p>
+      </a>
+      <a href="/languages/" class="block p-5 rounded-2xl border border-slate-200 bg-white shadow hover:shadow-md transition">
+        <h3 class="font-semibold">Indigenous Languages Living Atlas</h3>
+        <p class="text-sm text-slate-600 mt-1">Families, communities, projects—built with care.</p>
+      </a>
+      <a href="/energy/" class="block p-5 rounded-2xl border border-slate-200 bg-white shadow hover:shadow-md transition">
+        <h3 class="font-semibold">Energy & Critical Minerals Explorer</h3>
+        <p class="text-sm text-slate-600 mt-1">Hydro, wind, nuclear, nickel, lithium (demo dataset).</p>
+      </a>
+    </section>
+  </main>
+
+  <footer class="py-10 text-center text-xs">canada.himpfen.com</footer>
+</body>
+</html>

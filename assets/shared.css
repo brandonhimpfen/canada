@@ -1,0 +1,8 @@
+
+:root { --brand:#d51920; }
+html { scroll-behavior:smooth; }
+a { color: var(--brand); }
+.header-bar { backdrop-filter: blur(6px); }
+.nav a { padding: .25rem .5rem; border-radius:.5rem; }
+.nav a:hover { background: rgba(213,25,32,.08); }
+footer { color:#64748b; }

@@ -1,0 +1,8 @@
+
+.dark body { background:#0f172a; color:#e2e8f0 }
+.card { background:white; border:1px solid #e2e8f0; border-radius:1rem; box-shadow:0 10px 20px -12px rgba(2,6,23,.12) }
+.dark .card { background:rgba(15,23,42,.6); border-color:#1f2937 }
+.chart-canvas{width:100% !important; display:block}
+.timeline-item{border-left:3px solid #d51920; padding-left:.75rem}
+.timeline-title{font-weight:700}
+.timeline-meta{font-size:.8rem; color:#475569}

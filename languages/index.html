@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Indigenous Languages Living Atlas</title>
+  <meta name="description" content="Map of Indigenous language families in Canada with community-led projects and speaker trends. Demo dataset; respectful use only.">
+  <!-- Tailwind (dark mode via class) -->
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = { darkMode: 'class' };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="sticky top-0 z-30 backdrop-blur bg-white/70 border-b border-slate-200 dark:bg-slate-900/70 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🧭</span>
+        <h1 class="font-bold text-xl sm:text-2xl" data-i18n="title">Indigenous Languages Living Atlas</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="langToggle" class="px-3 py-2 rounded-xl border border-slate-300 text-sm">FR</button>
+        <button id="darkToggle" class="px-3 py-2 rounded-xl border border-slate-300 text-sm">Dark</button>
+        <a href="#" class="text-xs text-slate-500 hover:text-slate-700" id="version"></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Stewardship banner -->
+    <section class="mb-6">
+      <div class="card p-5">
+        <p class="text-sm leading-6" data-i18n="stewardship">
+          This demo is a respectful scaffold. Real projects should be co-designed with communities, use publicly shareable datasets, and follow Indigenous data governance principles (e.g., OCAP® in Canada). Names, locations, and counts below are illustrative for UI only.
+        </p>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="mb-6">
+      <div class="card p-5">
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+          <label class="inline-flex items-center gap-2"><input id="familyAlg" type="checkbox" class="scale-110" checked> <span>Algonquian</span></label>
+          <label class="inline-flex items-center gap-2"><input id="familyAth" type="checkbox" class="scale-110" checked> <span>Athabaskan / Dene</span></label>
+          <label class="inline-flex items-center gap-2"><input id="familyInu" type="checkbox" class="scale-110" checked> <span>Inuit (Inuktut)</span></label>
+          <label class="inline-flex items-center gap-2"><input id="familyIro" type="checkbox" class="scale-110" checked> <span>Iroquoian</span></label>
+          <label class="inline-flex items-center gap-2"><input id="familySal" type="checkbox" class="scale-110" checked> <span>Salishan</span></label>
+          <label class="inline-flex items-center gap-2"><input id="familyWak" type="checkbox" class="scale-110" checked> <span>Wakashan</span></label>
+          <label class="inline-flex items-center gap-2"><input id="familySio" type="checkbox" class="scale-110" checked> <span>Siouan</span></label>
+          <label class="inline-flex items-center gap-2"><input id="familyMet" type="checkbox" class="scale-110" checked> <span>Métis (Michif)</span></label>
+          <label class="inline-flex items-center gap-2 ml-2"><input id="toggleAutonym" type="checkbox" class="scale-110"> <span data-i18n="toggle_autonym">Show autonyms (self-names) where available</span></label>
+          <span class="text-xs text-slate-500 ml-auto" id="dataAsOf"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="kpi">
+        <div class="kpi-label" data-i18n="kpi_langs">Languages displayed</div>
+        <div class="kpi-value" id="kpiLangs">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label" data-i18n="kpi_communities">Communities</div>
+        <div class="kpi-value" id="kpiCommunities">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label" data-i18n="kpi_speakers">Estimated speakers (demo)</div>
+        <div class="kpi-value" id="kpiSpeakers">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label" data-i18n="kpi_projects">Revitalization projects</div>
+        <div class="kpi-value" id="kpiProjects">0</div>
+      </div>
+    </section>
+
+    <!-- Map + Trends -->
+    <section class="grid lg:grid-cols-3 gap-6 mb-6">
+      <div class="card lg:col-span-2 overflow-hidden">
+        <div class="card-header">
+          <h3 class="card-title" data-i18n="map_title">Map by language family</h3>
+          <p class="card-subtitle" data-i18n="map_sub">Click a marker to see a language entry and projects.</p>
+        </div>
+        <div id="map" class="h-[540px]"></div>
+        <div class="p-4 text-xs text-slate-500" data-i18n="map_legend">
+          Colour key: Algonquian (red), Athabaskan/Dene (orange), Inuit (blue), Iroquoian (purple), Salishan (green), Wakashan (teal), Siouan (pink), Métis (gold).
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title" id="trendTitle">Speakers trend</h3>
+          <p class="card-subtitle" data-i18n="trend_sub">Where public, approximate counts over time. Demo placeholders here.</p>
+        </div>
+        <div class="relative">
+          <div class="absolute right-2 top-2 flex gap-2">
+            <button id="btnTrendCSV" class="btn-lite">CSV</button>
+            <button id="btnTrendPNG" class="btn-lite">PNG</button>
+          </div>
+          <canvas id="trendChart" class="chart-canvas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- List -->
+    <section class="mb-10">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title" data-i18n="list_title">Languages & communities (filtered)</h3>
+          <p class="card-subtitle" data-i18n="list_sub">Select a row to focus the map and update the trend chart.</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-500">
+                <th class="py-2 px-3" data-i18n="col_language">Language</th>
+                <th class="py-2 px-3" data-i18n="col_family">Family</th>
+                <th class="py-2 px-3" data-i18n="col_community">Community</th>
+                <th class="py-2 px-3" data-i18n="col_province">Province/Territory</th>
+                <th class="py-2 px-3" data-i18n="col_speakers">Speakers (est.)</th>
+                <th class="py-2 px-3" data-i18n="col_projects">Projects</th>
+              </tr>
+            </thead>
+            <tbody id="langTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data stewardship & process -->
+    <section class="mb-10">
+      <div class="card p-5">
+        <h3 class="font-semibold mb-2" data-i18n="process_title">Process & data stewardship</h3>
+        <ul class="list-disc pl-6 space-y-2 text-sm">
+          <li data-i18n="process1">Co-design with communities and organizations. Confirm scope and consent before publishing any new data.</li>
+          <li data-i18n="process2">Use only publicly shareable datasets and respect Indigenous data governance (e.g., OCAP®). For non-public data, obtain permissions and avoid exposing sensitive locations or counts.</li>
+          <li data-i18n="process3">This demo uses small illustrative entries. Replace with your approved dataset and provide links to the original sources.</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="py-10 text-center text-xs text-slate-500">
+      <span data-i18n="footer">Bilingual UI • Dark mode • CSV/PNG exports • Built as a respectful starting point.</span>
+    </footer>
+  </main>
+
+  <script src="./atlas.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Great Canadian Places Index</title>
+  <meta name="description" content="Celebrate parks, trails, UNESCO sites, and small-town main streets — reasons to love Canada. Map + seasonality with bilingual EN/FR.">
+  <!-- Tailwind darkMode via class -->
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = { darkMode: 'class' };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="sticky top-0 z-30 backdrop-blur bg-white/70 border-b border-slate-200 dark:bg-slate-900/70 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🇨🇦</span>
+        <h1 class="font-bold text-xl sm:text-2xl" data-i18n="title">Great Canadian Places Index</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="langToggle" class="px-3 py-2 rounded-xl border border-slate-300 text-sm">FR</button>
+        <button id="darkToggle" class="px-3 py-2 rounded-xl border border-slate-300 text-sm">Dark</button>
+        <a href="#" class="text-xs text-slate-500 hover:text-slate-700" id="version"></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Intro -->
+    <section class="mb-6">
+      <div class="card p-5">
+        <p class="text-sm leading-6" data-i18n="intro">
+          Celebrate parks, trails, UNESCO sites, and small-town main streets — reasons to love Canada. Explore the map and see when each place shines through the seasons.
+        </p>
+        <p class="text-xs mt-2 text-slate-600 dark:text-slate-300">
+          Data sources: Parks Canada, UNESCO, Destination Canada, provincial tourism boards.
+        </p>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="mb-6">
+      <div class="card p-5">
+        <div class="flex flex-wrap items-center gap-4 text-sm">
+          <label class="inline-flex items-center gap-2"><input id="filterNature" type="checkbox" class="scale-110" checked> <span data-i18n="filter_nature">Nature</span></label>
+          <label class="inline-flex items-center gap-2"><input id="filterCulture" type="checkbox" class="scale-110" checked> <span data-i18n="filter_culture">Culture</span></label>
+          <label class="inline-flex items-center gap-2"><input id="filterFood" type="checkbox" class="scale-110" checked> <span data-i18n="filter_food">Food</span></label>
+          <label class="inline-flex items-center gap-2"><input id="toggleIndigenous" type="checkbox" class="scale-110"> <span data-i18n="toggle_indig">Show Indigenous name (when available)</span></label>
+          <span class="text-xs text-slate-500 ml-auto" id="dataAsOf"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPI cards -->
+    <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="kpi">
+        <div class="kpi-label" data-i18n="kpi_places">Places displayed</div>
+        <div class="kpi-value" id="kpiPlaces">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label" data-i18n="kpi_nature">Nature</div>
+        <div class="kpi-value" id="kpiNature">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label" data-i18n="kpi_culture">Culture</div>
+        <div class="kpi-value" id="kpiCulture">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label" data-i18n="kpi_food">Food</div>
+        <div class="kpi-value" id="kpiFood">0</div>
+      </div>
+    </section>
+
+    <!-- Map + Seasonality -->
+    <section class="grid lg:grid-cols-3 gap-6 mb-6">
+      <div class="card lg:col-span-2 overflow-hidden">
+        <div class="card-header">
+          <h3 class="card-title" data-i18n="map_title">Map of Great Canadian Places</h3>
+          <p class="card-subtitle" data-i18n="map_sub">Click a marker to see details and seasonality.</p>
+        </div>
+        <div id="map" class="h-[520px]"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title" id="seasonalityTitle">Seasonality</h3>
+          <p class="card-subtitle" data-i18n="seasonality_sub">Monthly visit index (normalized, 100 = peak).</p>
+        </div>
+        <div class="relative">
+          <div class="absolute right-2 top-2 flex gap-2">
+            <button id="btnSeasonCSV" class="btn-lite">CSV</button>
+            <button id="btnSeasonPNG" class="btn-lite">PNG</button>
+          </div>
+          <canvas id="seasonChart" class="chart-canvas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- List -->
+    <section class="mb-10">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title" data-i18n="list_title">Places (filtered)</h3>
+          <p class="card-subtitle" data-i18n="list_sub">Click a row to focus on the map and update the seasonality chart.</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-500">
+                <th class="py-2 px-3" data-i18n="col_name">Name</th>
+                <th class="py-2 px-3" data-i18n="col_category">Category</th>
+                <th class="py-2 px-3" data-i18n="col_province">Province/Territory</th>
+                <th class="py-2 px-3" data-i18n="col_source">Source</th>
+              </tr>
+            </thead>
+            <tbody id="placesTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="py-10 text-center text-xs text-slate-500">
+      <span data-i18n="footer">Built for exploration & pride. Bilingual UI, Indigenous names where provided.</span>
+    </footer>
+  </main>
+
+  <!-- Scripts -->
+  <script src="./places.js" defer></script>
+</body>
+</html>
