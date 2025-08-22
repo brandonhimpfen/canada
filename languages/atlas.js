@@ -3,7 +3,7 @@
 
 // -------- Meta --------
 const APP_VERSION = "v0.9.0";
-const DATA_AS_OF = "Demo compiled: 2025-08-22";
+const DATA_AS_OF = "Updated: 2021 Census family counts (StatCan, released 2025-03-31)";
 document.addEventListener('DOMContentLoaded', () => {
   const ver = document.getElementById('version'); if (ver) ver.textContent = APP_VERSION;
   const asof = document.getElementById('dataAsOf'); if (asof) asof.textContent = DATA_AS_OF;
@@ -32,7 +32,7 @@ let LANG = localStorage.getItem('lang') || 'en';
 const I18N = {
   en: {
     title: "Indigenous Languages Living Atlas",
-    stewardship: "This demo is a respectful scaffold. Real projects should be co-designed with communities, use publicly shareable datasets, and follow Indigenous data governance principles (e.g., OCAP® in Canada). Names, locations, and counts below are illustrative for UI only.",
+    stewardship: "This dashboard uses publicly released, national-level 2021 Census indicators (e.g., “knowledge of an Indigenous language”) and deliberately avoids community-level points. The simple map overlays are illustrative and not authoritative boundaries or territories. Any future, production use should be co-designed with Indigenous partners and guided by Indigenous data governance principles — including OCAP® in Canada and the CARE Principles — with appropriate consent, protocols, and context. Please treat names, locations, and counts here as UI scaffolding; they may be updated in consultation with communities.",
     toggle_autonym: "Show autonyms (self-names) where available",
     kpi_langs: "Languages displayed",
     kpi_communities: "Communities",
@@ -58,7 +58,7 @@ const I18N = {
   },
   fr: {
     title: "Atlas vivant des langues autochtones",
-    stewardship: "Cette démo est une ossature respectueuse. Les projets réels doivent être co‑conçus avec les communautés, utiliser des ensembles de données partageables publiquement et suivre les principes de gouvernance des données autochtones (p. ex., OCAP® au Canada). Les noms, lieux et décomptes ci‑dessous sont illustratifs pour l’interface uniquement.",
+    stewardship: "Cette tableau de bord utilise des indicateurs nationaux issus du Recensement de 2021 (p. ex. « connaissance d’une langue autochtone ») et évite volontairement les points à l’échelle des communautés. Les superpositions cartographiques sont schématiques et ne représentent pas des limites ou des territoires officiels. Tout déploiement en production devrait être co-conçu avec des partenaires autochtones et guidé par les principes de gouvernance des données autochtones — notamment OCAP® au Canada et les principes CARE — avec les consentements, protocoles et mises en contexte appropriés. Les noms, emplacements et dénombrements présentés servent de support d’interface et pourront être adaptés en concertation avec les communautés.",
     toggle_autonym: "Afficher les autonymes (noms propres) lorsqu’ils sont disponibles",
     kpi_langs: "Langues affichées",
     kpi_communities: "Communautés",
@@ -90,7 +90,7 @@ function applyI18N(){
     el.textContent = t(key);
   });
   document.getElementById('langToggle').textContent = LANG==='en'?'FR':'EN';
-  document.getElementById('trendTitle').textContent = LANG==='en'?'Speakers trend':'Évolution des locuteurs';
+  document.getElementById('trendTitle').textContent = 'Family counts (2021 snapshot)';
 }
 
 // -------- Data (demo) --------
@@ -106,25 +106,7 @@ const FAMILY_COLORS = {
   'Métis (Michif)': '#facc15' // gold
 };
 
-const ENTRIES = [
-  // Algonquian
-  { id:'cree_plains_regina', family:'Algonquian', language:'Cree (Plains Cree / nêhiyawêwin)', autonym:'nêhiyawêwin', community:'Regina area', province:'SK', lat:50.45, lng:-104.61, speakers_est:12000, trend:[12,12.1,12.2,12.0,11.9,11.8,11.7], projects:[{name:'Language classes', url:'#'}] },
-  { id:'ojibwe_thunderbay', family:'Algonquian', language:'Ojibwe / Anishinaabemowin', autonym:'Anishinaabemowin', community:'Thunder Bay area', province:'ON', lat:48.38, lng:-89.25, speakers_est:6000, trend:[6.0,6.0,5.9,5.8,5.8,5.7,5.6], projects:[{name:'Immersion program', url:'#'}] },
-  // Athabaskan / Dene
-  { id:'dene_yellowknife', family:'Athabaskan/Dene', language:'Dene (Tłı̨chǫ / Dogrib)', autonym:'Tłı̨chǫ Yatıì', community:'Yellowknife region', province:'NT', lat:62.45, lng:-114.38, speakers_est:2200, trend:[2.1,2.1,2.0,2.0,1.9,1.9,1.8], projects:[{name:'Radio & podcasts', url:'#'}] },
-  // Inuit
-  { id:'inuktitut_iqaluit', family:'Inuit', language:'Inuktitut', autonym:'ᐃᓄᒃᑎᑐᑦ', community:'Iqaluit', province:'NU', lat:63.7467, lng:-68.5170, speakers_est:14000, trend:[13.5,13.6,13.7,13.8,13.9,14.0,14.2], projects:[{name:'Curriculum resources', url:'#'}] },
-  // Iroquoian
-  { id:'mohawk_tyos', family:'Iroquoian', language:'Mohawk', autonym:'Kanienʼkéha', community:'Tyendinaga / Kahnawà:ke region', province:'ON/QC', lat:44.2, lng:-76.9, speakers_est:3000, trend:[2.8,2.9,3.0,3.1,3.1,3.2,3.3], projects:[{name:'Immersion school', url:'#'}] },
-  // Salishan
-  { id:'halkomelem_lower', family:'Salishan', language:'Halq’eméylem (Halkomelem)', autonym:'Halq’eméylem', community:'Lower Fraser Valley', province:'BC', lat:49.16, lng:-122.85, speakers_est:600, trend:[0.5,0.5,0.6,0.6,0.6,0.7,0.7], projects:[{name:'Elders teaching circle', url:'#'}] },
-  // Wakashan
-  { id:'nuuchahnulth', family:'Wakashan', language:'Nuu-chah-nulth', autonym:'Nuučaan̓uł', community:'Vancouver Island west coast', province:'BC', lat:49.0, lng:-126.5, speakers_est:300, trend:[0.28,0.28,0.29,0.30,0.31,0.32,0.33], projects:[{name:'Youth camp', url:'#'}] },
-  // Siouan
-  { id:'nakoda_morley', family:'Siouan', language:'Nakoda (Stoney)', autonym:'Îyârhe Nakoda', community:'Morley area', province:'AB', lat:51.1, lng:-115.07, speakers_est:1700, trend:[1.6,1.6,1.6,1.6,1.7,1.7,1.7], projects:[{name:'Community classes', url:'#'}] },
-  // Métis (Michif)
-  { id:'michif_saskatoon', family:'Métis (Michif)', language:'Michif', autonym:'Michif', community:'Saskatoon region', province:'SK', lat:52.13, lng:-106.67, speakers_est:1200, trend:[1.1,1.1,1.1,1.1,1.1,1.1,1.2], projects:[{name:'Digital archive', url:'#'}] }
-];
+const ENTRIES = [{"id":"fam_algonquian","family":"Algonquian","language":"Algonquian (family total)","autonym":"—","lat":53.0,"lng":-91.0,"province":"Multiple regions","speakers_est":163815,"trend":[163815,163815,163815,163815,163815,163815,163815],"projects":[{"name":"StatCan family report (2025)","url":"https://www150.statcan.gc.ca/n1/pub/41-20-0002/412000022025002-eng.htm"}]},{"id":"fam_athabaskan","family":"Athabaskan/Dene","language":"Athabaskan/Dene (family total)","autonym":"—","lat":61.0,"lng":-117.0,"province":"NWT/YT/AB/BC","speakers_est":20390,"trend":[20390,20390,20390,20390,20390,20390,20390],"projects":[{"name":"StatCan family report (2025)","url":"https://www150.statcan.gc.ca/n1/pub/41-20-0002/412000022025003-eng.htm"}]},{"id":"fam_inuktut","family":"Inuit","language":"Inuktut (family total)","autonym":"ᐃᓄᒃᑐᑦ","lat":66.0,"lng":-90.0,"province":"NU/NV/NL/NWT","speakers_est":42800,"trend":[42800,42800,42800,42800,42800,42800,42800],"projects":[{"name":"StatCan family report (2025)","url":"https://www150.statcan.gc.ca/n1/pub/41-20-0002/412000022025004-eng.htm"}]},{"id":"fam_iroquoian","family":"Iroquoian","language":"Iroquoian (family total)","autonym":"—","lat":44.0,"lng":-77.0,"province":"ON/QC","speakers_est":2055,"trend":[2055,2055,2055,2055,2055,2055,2055],"projects":[{"name":"StatCan family report (2025)","url":"https://www150.statcan.gc.ca/n1/pub/41-20-0002/412000022025005-eng.htm"}]},{"id":"fam_salish","family":"Salishan","language":"Salishan (family total)","autonym":"—","lat":50.0,"lng":-122.0,"province":"BC","speakers_est":5305,"trend":[5305,5305,5305,5305,5305,5305,5305],"projects":[{"name":"StatCan family report (2025)","url":"https://www150.statcan.gc.ca/n1/pub/41-20-0002/412000022025009-eng.htm"}]},{"id":"fam_wakashan","family":"Wakashan","language":"Wakashan (family total)","autonym":"—","lat":50.0,"lng":-128.0,"province":"BC","speakers_est":2205,"trend":[2205,2205,2205,2205,2205,2205,2205],"projects":[{"name":"StatCan family report (2025)","url":"https://www150.statcan.gc.ca/n1/pub/41-20-0002/412000022025010-eng.htm"}]},{"id":"fam_siouan","family":"Siouan","language":"Siouan (family total)","autonym":"—","lat":50.0,"lng":-106.0,"province":"SK/MB","speakers_est":2965,"trend":[2965,2965,2965,2965,2965,2965,2965],"projects":[{"name":"StatCan family report (2025)","url":"https://www150.statcan.gc.ca/n1/pub/41-20-0002/412000022025006-eng.htm"}]},{"id":"fam_tsimshian","family":"Tsimshian","language":"Tsimshianic (family total)","autonym":"—","lat":54.5,"lng":-130.0,"province":"BC","speakers_est":2665,"trend":[2665,2665,2665,2665,2665,2665,2665],"projects":[{"name":"StatCan family report (2025)","url":"https://www150.statcan.gc.ca/n1/pub/41-20-0002/412000022025008-eng.htm"}]}];
 const TREND_YEARS = [2019,2020,2021,2022,2023,2024,2025];
 
 // -------- Map --------
@@ -202,7 +184,7 @@ function buildTrendChart(){
   const ctx = document.getElementById('trendChart').getContext('2d');
   trendChart = new Chart(ctx, {
     type: 'line',
-    data: { labels: TREND_YEARS, datasets: [{ label: 'Speakers (est.)', data: [], borderWidth: 2, tension: 0.2 }]},
+    data: { labels: TREND_YEARS, datasets: [{ label: 'Total speakers (knowledge) — selected families (2021 snapshot)', data: [], borderWidth: 2, tension: 0.2 }]},
     options: {
       responsive: true, aspectRatio: 1.9, maintainAspectRatio: true,
       scales: { y:{ beginAtZero: true, title:{ display:true, text: 'Speakers (est.)'} } },
@@ -213,7 +195,7 @@ function buildTrendChart(){
 function updateTrend(entry){
   trendChart.data.datasets[0].data = entry.trend || [];
   trendChart.update();
-  document.getElementById('trendTitle').textContent = (LANG==='en'?'Speakers trend: ':'Évolution des locuteurs : ') + entry.language;
+  document.getElementById('trendTitle').textContent = 'Family counts (2021 snapshot)';
 }
 
 // Default trend: aggregate average of filtered entries
@@ -224,7 +206,7 @@ function updateTrendAverage(){
   const avg = TREND_YEARS.map((_,i)=> Math.round(arrs.reduce((a,b)=>a+(b[i]||0),0)/arrs.length*100)/100);
   trendChart.data.datasets[0].data = avg;
   trendChart.update();
-  document.getElementById('trendTitle').textContent = LANG==='en'?'Speakers trend: filtered average':'Évolution des locuteurs : moyenne filtrée';
+  document.getElementById('trendTitle').textContent = 'Family counts (2021 snapshot)';
 }
 
 // -------- Export helpers --------
